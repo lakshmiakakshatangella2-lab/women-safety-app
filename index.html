@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety App</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- SPLASH -->
+        <div class="screen active" id="intro" style="background:var(--grey-light);">
+
+            <div class="intro-slide active">
+                <img src="images/hero_home.png" alt="Safety Image"
+                    style="object-fit:cover; height:240px; border-radius:25px; margin-top:40px;">
+                <h2>Stay Secure</h2>
+                <p>Equip yourself with smart, modern safety tools designed specifically for your protection.</p>
+            </div>
+
+            <div class="intro-slide">
+                <img src="images/hero_sos.png" alt="SOS Image"
+                    style="object-fit:cover; height:240px; border-radius:25px; margin-top:40px;">
+                <h2>Instant Help</h2>
+                <p>Trigger instant SOS alerts to your contacts and authorities with a single tap or voice phrase.</p>
+            </div>
+
+            <div class="intro-slide">
+                <img src="images/slide3.png" alt="Map Location Image"
+                    style="object-fit:cover; height:240px; border-radius:25px; margin-top:40px;">
+                <h2>Live Tracking</h2>
+                <p>Share your real-time location with loved ones continuously in the background.</p>
+            </div>
+
+            <div style="padding:0 20px;">
+                <button onclick="nextSlide()" style="box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);">Continue</button>
+                <button onclick="skipIntro()"
+                    style="background:transparent; color:var(--primary); box-shadow:none;">Skip Intro</button>
+            </div>
+        </div>
+
+
+        <div class="screen" id="login">
+            <div class="header">
+                <h2 id="authTitle">Login</h2>
+            </div>
+
+            <div id="authMessage" style="color:red; text-align:center; font-weight:bold; margin-bottom:10px;"></div>
+
+            <input id="username" placeholder="Enter Username">
+            <input id="phone" placeholder="Enter Phone Number" style="display:none;">
+            <input id="password" type="password" placeholder="Enter Password">
+
+            <button id="authBtn" onclick="loginUser()">Login</button>
+            <p id="authToggleText" style="text-align: center; margin-top: 15px; cursor: pointer; color: var(--primary); font-weight:600;" onclick="toggleAuth()">Don't have an account? Sign Up</p>
+        </div>
+
+        <!-- HOME -->
+        <div class="screen" id="home">
+            <div class="header header-home" style="display:flex; justify-content:space-between; align-items:center;">
+                <img src="images/logo.png" alt="DefendHer Logo" class="brand-logo" style="margin:0;">
+                <button onclick="logoutUser()" style="width:auto; padding:8px 15px; margin:0; background:var(--danger); box-shadow:none; font-size:14px;">Logout</button>
+            </div>
+
+            <div class="hero-container">
+                <img src="images/hero.png" alt="Safety Hero" class="hero-image">
+            </div>
+            <h1 id="welcomeUser">Stay Safe</h1>
+            <p>Your Safety Matters</p>
+
+            <button onclick="showScreen('menu')">Get Started</button>
+
+            <div class="circle-slider">
+                <img src="images/child.jpeg" class="circle-img active">
+                <img src="images/kid.jpg" class="circle-img">
+                <img src="images/add.jpg" class="circle-img">
+                <img src="images/adult.jpeg" class="circle-img">
+                <img src="images/old.jpeg" class="circle-img">
+            </div>
+        </div>
+
+        <!-- MENU -->
+        <div class="screen" id="menu">
+            <div class="header">
+                <span class="back" onclick="showScreen('home')">←</span>
+                <h2>Menu</h2>
+            </div>
+
+            <div class="menu-container">
+                <button onclick="showScreen('dataset')">📊 Dataset</button>
+                <button onclick="showScreen('mapScreen')">🗺️ Live Map</button>
+                <button onclick="showScreen('liveTracking')">📍 Live Tracking</button>
+                <button onclick="showScreen('contacts')">📞 Contacts</button>
+                <button onclick="showScreen('dashboards')">📈 Dashboards</button>
+                <button onclick="showScreen('tips')">🛡 Tips</button>
+                <button onclick="showScreen('emergency')">🚨 Emergency</button>
+                <button onclick="showScreen('feedback')">💬 Feedback</button>
+            </div>
+        </div>
+
+        <!-- DATASET -->
+        <div class="screen" id="dataset">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Dataset</h3>
+            </div>
+            <p>Crime Records and Data</p>
+        </div>
+
+        <!-- DASHBOARDS -->
+        <div class="screen" id="dashboards" style="padding:0; overflow:hidden;">
+            <div class="header"
+                style="background:transparent; color:#333; padding:15px; display:flex; align-items:center; gap:15px; position:absolute; z-index:1000;">
+                <span class="back" onclick="showScreen('menu')"
+                    style="color:#333; font-size:1.5rem; cursor:pointer; background:rgba(255,255,255,0.8); border-radius:50%; width:40px; height:40px; display:flex; justify-content:center; align-items:center;">←</span>
+            </div>
+
+            <div class="dashboard-page">
+
+                <h1>Women Safety Dashboard</h1>
+
+                <div class="tabs">
+                    <button onclick="showTab(1)">Crime Analysis</button>
+                    <button onclick="showTab(2)">Literacy vs Crime</button>
+                    <button onclick="showTab(3)">State Safety</button>
+                </div>
+
+                <div id="tab1" class="tab-content active">
+                    <iframe
+                        src="https://public.tableau.com/views/Dashboard1_17749489415300/Dashboard1?:embed=y&:showVizHome=no"></iframe>
+                </div>
+
+                <div id="tab2" class="tab-content">
+                    <iframe
+                        src="https://public.tableau.com/views/Dashboard2_17749490536820/Dashboard1?:embed=y&:showVizHome=no"></iframe>
+                </div>
+
+                <div id="tab3" class="tab-content">
+                    <iframe
+                        src="https://public.tableau.com/views/Dashboard3_17749491119000/Dashboard1?:embed=y&:showVizHome=no"></iframe>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- MAP SECTION -->
+        <div class="screen" id="mapScreen">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Live Location</h3>
+            </div>
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+            <button onclick="shareLocation()" class="glow" style="margin-top: 15px;">Send Current Location</button>
+        </div>
+
+        <!-- LIVE TRACKING SECTION -->
+        <div class="screen" id="liveTracking">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Live Tracking</h3>
+            </div>
+            <div class="map-wrapper" style="height: calc(100vh - 120px);">
+                <div id="liveMap" style="height: 100%; width: 100%; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);"></div>
+            </div>
+        </div>
+
+        <!-- TIPS MAIN -->
+        <div class="screen" id="tips">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Safety Tips</h3>
+            </div>
+
+            <button onclick="openTip('general')">🏠 General Safety</button>
+            <button onclick="openTip('mobile')">📱 Mobile Safety</button>
+            <button onclick="openTip('travel')">🚕 Travel Safety</button>
+            <button onclick="openTip('work')">🏢 Workplace Safety</button>
+            <button onclick="openTip('emergencyTips')">🚨 Emergency Tips</button>
+        </div>
+
+        <!-- GENERAL -->
+        <div class="screen" id="general">
+            <div class="header">
+                <span class="back" onclick="showScreen('tips')">←</span>
+                <h3>General Safety</h3>
+            </div>
+
+            <div class="card">Avoid isolated areas</div>
+            <div class="card">Stay alert in public places</div>
+            <div class="card">Trust your instincts</div>
+            <div class="card">Walk confidently</div>
+            <div class="card">Avoid distractions</div>
+            <div class="card">Stay in well-lit areas</div>
+        </div>
+
+        <!-- MOBILE -->
+        <div class="screen" id="mobile">
+            <div class="header">
+                <span class="back" onclick="showScreen('tips')">←</span>
+                <h3>Mobile Safety</h3>
+            </div>
+
+            <div class="card">Share live location</div>
+            <div class="card">Keep phone charged</div>
+            <div class="card">Enable SOS</div>
+            <div class="card">Save emergency contacts</div>
+            <div class="card">Use safety apps</div>
+        </div>
+
+        <!-- TRAVEL -->
+        <div class="screen" id="travel">
+            <div class="header">
+                <span class="back" onclick="showScreen('tips')">←</span>
+                <h3>Travel Safety</h3>
+            </div>
+
+            <div class="card">Verify cab details</div>
+            <div class="card">Share ride details</div>
+            <div class="card">Avoid late travel</div>
+            <div class="card">Sit in back seat</div>
+            <div class="card">Track route</div>
+        </div>
+
+        <!-- WORKPLACE -->
+        <div class="screen" id="work">
+            <div class="header">
+                <span class="back" onclick="showScreen('tips')">←</span>
+                <h3>Workplace Safety</h3>
+            </div>
+
+            <div class="card">Inform before late work</div>
+            <div class="card">Avoid empty areas</div>
+            <div class="card">Report suspicious activity</div>
+            <div class="card">Use office transport</div>
+        </div>
+        <!-- EMERGENCY TIPS -->
+        <div class="screen" id="emergencyTips">
+
+            <div class="header">
+                <span class="back" onclick="showScreen('tips')">←</span>
+                <h3>Emergency Tips</h3>
+            </div>
+
+            <div class="card">Call 1091 (Women Helpline)</div>
+            <div class="card">Call 100 (Police)</div>
+            <div class="card">Call 112 (National Emergency)</div>
+            <div class="card">Use SOS button immediately</div>
+            <div class="card">Shout for help if needed</div>
+            <div class="card">Move to crowded place</div>
+
+        </div>
+
+
+        <!-- EMERGENCY -->
+        <div class="screen" id="emergency">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Emergency Services</h3>
+            </div>
+
+            <button id="sosButton" class="sos glow" onclick="sendSOS()">⚡ SOS NOW</button>
+
+            <div class="action-grid">
+                <div class="action-btn" onclick="callNumber('1091')">
+                    <div class="icon-circle" style="background: linear-gradient(135deg, #e84393, #fd79a8);">📞</div>
+                    <span>Women Helpline</span>
+                </div>
+                <div class="action-btn" onclick="callNumber('112')">
+                    <div class="icon-circle" style="background: linear-gradient(135deg, #d63031, #ff7675);">🚨</div>
+                    <span>Emergency</span>
+                </div>
+                <div class="action-btn" onclick="callNumber('100')">
+                    <div class="icon-circle" style="background: linear-gradient(135deg, #0984e3, #74b9ff);">🚔</div>
+                    <span>Police</span>
+                </div>
+                <div class="action-btn" onclick="triggerFakeCall()">
+                    <div class="icon-circle" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">📱</div>
+                    <span>Fake Call</span>
+                </div>
+                <div class="action-btn" onclick="playSiren()">
+                    <div class="icon-circle" style="background: linear-gradient(135deg, #fdcb6e, #ffeaa7);">🔊</div>
+                    <span>Loud Siren</span>
+                </div>
+                <div class="action-btn" onclick="shareLocation()">
+                    <div class="icon-circle" style="background: linear-gradient(135deg, #00b894, #55efc4);">📍</div>
+                    <span>Share Location</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACTS -->
+        <div class="screen" id="contacts">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Emergency Contacts</h3>
+            </div>
+
+            <input id="contactNumber" placeholder="Enter Contact Number">
+            <button onclick="addContact()">Add Contact</button>
+
+            <div id="contactList"></div>
+        </div>
+
+        <!-- FEEDBACK -->
+        <div class="screen" id="feedback">
+            <div class="header">
+                <span class="back" onclick="showScreen('menu')">←</span>
+                <h3>Feedback</h3>
+            </div>
+            <p class="quote">"Your voice matters. Help us improve women's safety."</p>
+
+            <input id="name" placeholder="Name">
+            <input id="email" placeholder="Email">
+            <textarea id="msg" placeholder="Message"></textarea>
+
+            <button onclick="submitFeedback()">Submit</button>
+        </div>
+
+    </div>
+
+    <!-- Hidden Audios for Root App -->
+    <audio id="sirenAudioRoot" src="https://assets.mixkit.co/active_storage/sfx/993/993-preview.mp3" loop></audio>
+    <audio id="ringtoneAudioRoot" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
