@@ -1,9 +1,463 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Women Safety App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DefendHer - Professional Women Safety App</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Leaflet.js for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
 </head>
-<body>
-    <h1>Women Safety App is Working ✅</h1>
+<body class="loading">
+
+    <!-- Splash Screen -->
+    <div id="splashScreen">
+        <div class="splash-content animate__animated animate__zoomIn">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="DefendHer Logo" style="height: 120px; margin-bottom: 20px;">
+            <h1>DefendHer</h1>
+            <p>Your Security, Our Priority.</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content animate__animated animate__zoomIn">
+            <span class="close-btn" onclick="toggleAuthModal()">&times;</span>
+            <h2 id="modalTitle">Secure Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="text" id="phone" placeholder="Phone Number" style="display:none; margin-top:15px; margin-bottom:15px; width:100%; padding:12px; border-radius:8px; border:1px solid #ddd;">
+            <input type="password" id="password" placeholder="Password" style="margin-top:10px;">
+            <button id="authActionBtn" class="primary-btn btn btn-primary full-width" onclick="handleAuth()">Login</button>
+            <p class="switch-auth" onclick="switchAuthMode()">Need an account? Sign Up</p>
+        </div>
+    </div>
+
+    <!-- Intro Slider Modal -->
+    <div id="introSlider" class="modal" style="background: rgba(45, 52, 54, 0.95); z-index: 3000; display: none;">
+        <div class="modal-content animate__animated animate__fadeInUp" style="background: transparent; box-shadow: none; color: white;">
+            
+            <!-- Slide 1 -->
+            <div class="carousel-slide active-slide" id="slide1">
+                <div class="avatar-circle" style="margin: 0 auto; width: 180px; height: 180px;">
+                    <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=300&h=300&fit=crop" style="width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--primary); object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                </div>
+                <h2 style="margin-top: 25px; font-size: 2rem;">Safety for Every Girl</h2>
+                <p style="color: #dfe6e9; font-size: 1.1rem; margin-bottom: 30px;">Equip yourself with smart tools for immediate protection.</p>
+                <button class="btn btn-primary full-width" style="padding: 15px; font-size: 1.1rem;" onclick="nextSlide(2)">Continue to Step 2 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="carousel-slide" id="slide2" style="display: none;">
+                <div class="avatar-circle" style="margin: 0 auto; width: 180px; height: 180px;">
+                    <img src="https://images.unsplash.com/photo-1628196613098-b80df96bb738?w=300&h=300&fit=crop" style="width: 100%; height: 100%; border-radius: 50%; border: 4px solid #00cec9; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                </div>
+                <h2 style="margin-top: 25px; font-size: 2rem;">Safety for Every Teen</h2>
+                <p style="color: #dfe6e9; font-size: 1.1rem; margin-bottom: 30px;">Stay securely connected with live location tracking.</p>
+                <button class="btn btn-primary full-width" style="padding: 15px; font-size: 1.1rem; background: #00cec9;" onclick="nextSlide(3)">Continue to Step 3 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="carousel-slide" id="slide3" style="display: none;">
+                <div class="avatar-circle" style="margin: 0 auto; width: 180px; height: 180px;">
+                    <img src="https://images.unsplash.com/photo-1581561571578-8314e66d9c6c?w=300&h=300&fit=crop" style="width: 100%; height: 100%; border-radius: 50%; border: 4px solid #fdcb6e; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                </div>
+                <h2 style="margin-top: 25px; font-size: 2rem;">Safety for Every Woman</h2>
+                <p style="color: #dfe6e9; font-size: 1.1rem; margin-bottom: 30px;">Because you deserve to walk confidently anywhere.</p>
+                <button class="btn btn-danger full-width" style="padding: 15px; font-size: 1.1rem;" onclick="finishIntro()">Get Started <i class="fa-solid fa-check"></i></button>
+            </div>
+            
+            <p class="skip-intro" onclick="finishIntro()" style="margin-top: 20px; color: #b2bec3; cursor: pointer; font-size: 0.9rem; text-decoration: underline;">Skip Intro</p>
+        </div>
+    </div>
+
+    <!-- Sticky Navbar -->
+    <nav class="navbar" id="navbar" style="display:none;">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="DefendHer Logo" style="height: 40px; margin-right: 10px;">
+            <span>DefendHer</span>
+        </div>
+        <ul class="nav-links" style="display: flex; align-items: center;">
+            <li><a href="javascript:void(0)" onclick="switchScreen('home')">Home</a></li>
+            <li><a href="javascript:void(0)" onclick="switchScreen('features')">Features</a></li>
+            <li><a href="javascript:void(0)" onclick="switchScreen('contacts')">Contacts</a></li>
+            <li><a href="javascript:void(0)" onclick="switchScreen('dashboard')">Dashboards</a></li>
+            <li><a href="javascript:void(0)" onclick="switchScreen('settings')">Settings</a></li>
+        </ul>
+        <div class="user-actions">
+            <button id="loginBtn" class="login-btn" onclick="toggleAuthModal()"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+            <button id="logoutBtn" class="login-btn hidden" onclick="logOut()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+
+    </nav>
+
+    <!-- Main Content wrapper (hidden until splash finishes) -->
+    <div id="mainContent" style="display:none;">
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="bottom-nav">
+            <a href="javascript:void(0)" class="nav-item active" onclick="setActiveNav(this, 'home')">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="setActiveNav(this, 'dashboard')">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Data</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item nav-emergency" onclick="setActiveNav(this, 'emergency')">
+                <div class="emergency-circle pulse">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="setActiveNav(this, 'tracking')">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Map</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="setActiveNav(this, 'tips')">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Tips</span>
+            </a>
+            <a href="javascript:void(0)" class="nav-item" onclick="setActiveNav(this, 'settings')">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <!-- Home Section -->
+        <section id="home" class="section-home active-section">
+            <div class="overlay"></div>
+            <div class="content">
+                <h1 class="animate__animated animate__fadeInDown">Empowering Women, Ensuring Safety</h1>
+                <p class="quote animate__animated animate__fadeInUp animate__delay-1s">"A woman is unstoppable after she realizes she deserves better."</p>
+                <div class="action-buttons animate__animated animate__fadeInUp animate__delay-2s">
+                    <a href="javascript:void(0)" onclick="switchScreen('emergency')" class="btn btn-danger pulse"><i class="fa-solid fa-bell"></i> I Need Help</a>
+                    <a href="javascript:void(0)" onclick="switchScreen('tracking')" class="btn btn-primary"><i class="fa-solid fa-location-dot"></i> Real-time Map</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="section-features" style="display:none; padding-top: 100px; min-height: 100vh; background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
+            <div class="container" data-aos="fade-up">
+                <h2 class="section-title text-dark" style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Core Features</h2>
+                <p class="quote" style="color: #f1f2f6;">"Everything you need, separated clearly for your safety."</p>
+                <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px;">
+                    <div class="feature-card glassmorphism" onclick="switchScreen('emergency')" style="cursor: pointer; text-align: center; transition: transform 0.3s; padding: 40px 20px;">
+                        <i class="fa-solid fa-bell" style="font-size: 3.5rem; color: #ff4757; margin-bottom: 20px;"></i>
+                        <h3 style="color: #2d3436; font-size: 1.5rem;">Emergency SOS</h3>
+                    </div>
+                    <div class="feature-card glassmorphism" onclick="switchScreen('tracking')" style="cursor: pointer; text-align: center; transition: transform 0.3s; padding: 40px 20px;">
+                        <i class="fa-solid fa-location-dot" style="font-size: 3.5rem; color: #0984e3; margin-bottom: 20px;"></i>
+                        <h3 style="color: #2d3436; font-size: 1.5rem;">Live Map View</h3>
+                    </div>
+                    <div class="feature-card glassmorphism" onclick="switchScreen('tips')" style="cursor: pointer; text-align: center; transition: transform 0.3s; padding: 40px 20px;">
+                        <i class="fa-solid fa-lightbulb" style="font-size: 3.5rem; color: #fdcb6e; margin-bottom: 20px;"></i>
+                        <h3 style="color: #2d3436; font-size: 1.5rem;">Safety Tips</h3>
+                    </div>
+                    <div class="feature-card glassmorphism" onclick="switchScreen('settings')" style="cursor: pointer; text-align: center; transition: transform 0.3s; padding: 40px 20px;">
+                        <i class="fa-solid fa-gear" style="font-size: 3.5rem; color: #00b894; margin-bottom: 20px;"></i>
+                        <h3 style="color: #2d3436; font-size: 1.5rem;">App Settings</h3>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .feature-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.2) !important; background: rgba(255,255,255,0.9); }
+            </style>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section-dashboard" style="display:none; padding: 75px 0 0 0; margin: 0; width: 100vw; min-height: 100vh; background-color: #f9def2;">
+            <div style="width: 100vw; max-width: 100%; padding: 0; margin: 0; min-height: 100vh; display: flex; flex-direction: column;" data-aos="fade-in">
+                
+                <div class="dashboard-tabs" style="display: flex; gap: 15px; padding: 15px 0; margin: 0; flex-wrap: wrap; justify-content: center; background-color: #f9def2;">
+                    <button class="btn btn-primary dash-tab-btn" id="tab-crime-analysis" onclick="switchDashboardTab('crime-analysis')" style="font-size: 1.1rem;">Crime Analysis</button>
+                    <button class="btn btn-outline dash-tab-btn" id="tab-literacy-crime" onclick="switchDashboardTab('literacy-crime')" style="font-size: 1.1rem;">Literacy vs Crime</button>
+                    <button class="btn btn-outline dash-tab-btn" id="tab-state-safety" onclick="switchDashboardTab('state-safety')" style="font-size: 1.1rem;">State Safety</button>
+                </div>
+
+                <!-- Dashboard 1: Crime Analysis -->
+                <div id="crime-analysis" class="dashboard-panel" style="margin: 0; padding: 0; background: #f9def2; width: 100vw; height: 1000px; display: block;">
+                    <iframe src="https://public.tableau.com/views/Dashboard1_17749489415300/Dashboard1?:embed=y&:showVizHome=no&:device=desktop" style="width: 100%; height: 1000px; border: none; display: block; background: transparent;" allowfullscreen></iframe>
+                </div>
+
+                <!-- Dashboard 2: Literacy vs Crime -->
+                <div id="literacy-crime" class="dashboard-panel" style="display: none; margin: 0; padding: 0; background: #f9def2; width: 100vw; height: 1000px;">
+                    <iframe src="https://public.tableau.com/views/Dashboard2_17749490536820/Dashboard1?:embed=y&:showVizHome=no&:device=desktop" style="width: 100%; height: 1000px; border: none; display: block; background: transparent;" allowfullscreen></iframe>
+                </div>
+
+                <!-- Dashboard 3: State Safety -->
+                <div id="state-safety" class="dashboard-panel" style="display: none; margin: 0; padding: 0; background: #f9def2; width: 100vw; height: 1000px;">
+                    <iframe src="https://public.tableau.com/views/Dashboard3_17749491119000/Dashboard1?:embed=y&:showVizHome=no&:device=desktop" style="width: 100%; height: 1000px; border: none; display: block; background: transparent;" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Tips Section -->
+        <section id="tips" class="section-tips">
+            <div class="container" data-aos="fade-right">
+                <h2 class="section-title">Safety Guidelines</h2>
+                <p class="quote">"Knowledge and instincts are your strongest weapons."</p>
+
+                <div class="tips-navigation">
+                    <button class="btn btn-outline active-tip" onclick="showTip('general')">General</button>
+                    <button class="btn btn-outline" onclick="showTip('mobile')">Mobile</button>
+                    <button class="btn btn-outline" onclick="showTip('travel')">Travel</button>
+                    <button class="btn btn-outline" onclick="showTip('workplace')">Workplace</button>
+                    <button class="btn btn-danger" onclick="showTip('emergencytips')">Emergency</button>
+                </div>
+
+                <div class="tips-content glassmorphism" id="tipsDisplay">
+                    <!-- Javascript populates specific tip cards here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Emergency Section -->
+        <section id="emergency" class="section-emergency">
+            <div class="container" data-aos="zoom-in">
+                <h2 class="section-title">Immediate Emergency</h2>
+                <p class="quote">"Courage is not the absence of fear, but the triumph over it."</p>
+                
+                <div class="sos-card glassmorphism">
+                    <button class="sos-master-btn pulse-red" onclick="triggerSOS()">
+                        <i class="fa-solid fa-power-off"></i> SOS
+                    </button>
+                    <p>Press to call authorities, alert ALL contacts and broadcast LIVE location.</p>
+                    <div class="shake-indicator" style="margin-bottom: 10px;">
+                        <i class="fa-solid fa-mobile-screen-button bounce"></i>
+                        <span>Shake phone rapidly to trigger</span>
+                    </div>
+                    <div class="shake-indicator" style="color: var(--danger);">
+                        <i class="fa-solid fa-microphone-lines pulse"></i>
+                        <span id="voiceStatus">Say "Help Me" to auto-trigger SOS</span>
+                    </div>
+                </div>
+
+                <div class="action-grid">
+                    <div class="action-btn" onclick="window.location.href='tel:1091'" data-aos="zoom-in" data-aos-delay="0">
+                        <div class="icon-circle" style="background: linear-gradient(135deg, #e84393, #fd79a8);"><i class="fa-solid fa-person-dress"></i></div>
+                        <span>Women Helpline</span>
+                    </div>
+                    <div class="action-btn" onclick="window.location.href='tel:112'" data-aos="zoom-in" data-aos-delay="50">
+                        <div class="icon-circle" style="background: linear-gradient(135deg, #d63031, #ff7675);"><i class="fa-solid fa-truck-medical"></i></div>
+                        <span>Emergency</span>
+                    </div>
+                    <div class="action-btn" onclick="window.location.href='tel:100'" data-aos="zoom-in" data-aos-delay="100">
+                        <div class="icon-circle" style="background: linear-gradient(135deg, #0984e3, #74b9ff);"><i class="fa-solid fa-building-shield"></i></div>
+                        <span>Police</span>
+                    </div>
+                    <div class="action-btn" onclick="triggerFakeCall()" data-aos="zoom-in" data-aos-delay="150">
+                        <div class="icon-circle" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);"><i class="fa-solid fa-phone-volume"></i></div>
+                        <span>Fake Call</span>
+                    </div>
+                    <div class="action-btn" onclick="playSiren()" data-aos="zoom-in" data-aos-delay="200">
+                        <div class="icon-circle" style="background: linear-gradient(135deg, #fdcb6e, #ffeaa7);"><i class="fa-solid fa-bullhorn" style="color:#2d3436;"></i></div>
+                        <span>Loud Siren</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tracking Section (Google Maps) -->
+        <section id="tracking" class="section-tracking">
+            <div class="container" data-aos="fade-up">
+                <h2 class="section-title text-dark">Live Location & Real-time Tracking</h2>
+                <p class="quote text-dark-muted">"The path of safety is built on visibility."</p>
+                
+                <div class="map-container glassmorphism">
+                    <div class="map-controls">
+                        <div class="coords-display" id="geoCoords">Acquiring Satellites...</div>
+                        <button class="btn btn-primary" onclick="locateNearbyPolice()"><i class="fa-solid fa-building-flag"></i> Nearest Police Station</button>
+                        <div class="toggle-container">
+                            <span>Background Sync to Backend Server</span>
+                            <label class="switch">
+                                <input type="checkbox" id="bgTrackToggle" onchange="toggleBackgroundTracking()">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- OpenStreetMap via Leaflet -->
+                    <div id="map" style="width:100%; height:450px; border-radius: 10px; background: #e0e0e0; z-index: 1;">
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#555;">Initializing Map...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contacts Section -->
+        <section id="contacts" class="section-contacts">
+            <div class="container" data-aos="fade-up">
+                <h2 class="section-title">Emergency Contacts</h2>
+                <p class="quote">"Together we are stronger, safer, and never alone."</p>
+
+                <div class="contact-manager glassmorphism">
+                    <div class="add-contact-form">
+                        <input type="text" id="contactName" placeholder="Guardian Name">
+                        <input type="tel" id="contactPhone" placeholder="Phone Number (+1...)">
+                        <button class="btn btn-primary" onclick="addTrustedContact()"><i class="fa-solid fa-user-plus"></i> Save to Database</button>
+                    </div>
+                    <div id="contactsList" class="contacts-grid">
+                        <!-- Contacts render dynamically from SQLite DB -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback / Incident Report -->
+        <section id="feedback" class="section-feedback">
+            <div class="container" data-aos="fade-up">
+                <h2 class="section-title">Feedback & Incident Reporting</h2>
+                <p class="quote">"Your voice has the power to protect others."</p>
+
+                <div class="feedback-form glassmorphism">
+                    <p>Report an uncomfortable incident to help update our safety dataset map anonymously.</p>
+                    <input type="text" id="fbName" placeholder="Name (Optional)">
+                    <input type="email" id="fbEmail" placeholder="Email (Optional)">
+                    <textarea id="fbMessage" rows="5" placeholder="Describe the incident, location, or general feedback..." required></textarea>
+                    <button class="btn btn-primary full-width" onclick="submitFeedback()"><i class="fa-solid fa-database"></i> Submit to Backend Database</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section-settings">
+            <div class="container" data-aos="fade-up">
+                <h2 class="section-title" style="color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">App Settings & Profile</h2>
+                <p class="quote" style="color: #f1f2f6;">"Customize your safety experience."</p>
+
+                <div class="settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <!-- Profile Card -->
+                    <div class="settings-card glassmorphism">
+                        <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-user"></i> User Profile</h3>
+                        <div class="profile-form">
+                            <input type="text" id="profileName" placeholder="Full Name" value="Jane Doe" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
+                            <input type="email" id="profileEmail" placeholder="Email Address" value="jane.doe@example.com" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc;">
+                            <button class="btn btn-primary full-width" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+                        </div>
+                    </div>
+
+                    <!-- Appearance & Prefs -->
+                    <div class="settings-card glassmorphism">
+                        <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-palette"></i> Appearance & App</h3>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4><i class="fa-solid fa-moon"></i> Dark Mode</h4>
+                                <span style="font-size: 0.85rem; color: #777;">High-contrast dark theme</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <hr style="border:0; border-top:1px solid rgba(0,0,0,0.1); margin:15px 0;">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4><i class="fa-solid fa-microphone"></i> Voice Activation</h4>
+                                <span style="font-size: 0.85rem; color: #777;">Listen for "Help Me" trigger</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="voiceToggle" onchange="toggleVoiceControl()" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- App Permissions -->
+                    <div class="settings-card glassmorphism">
+                        <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-shield-halved"></i> App Permissions</h3>
+                        
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4><i class="fa-solid fa-location-dot"></i> Location Access</h4>
+                                <span id="locPermStatus" style="font-size: 0.85rem; color: #777;">Checking...</span>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.85rem;" onclick="requestLocation()">Verify</button>
+                        </div>
+                        <hr style="border:0; border-top:1px solid rgba(0,0,0,0.1); margin:15px 0;">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4><i class="fa-solid fa-microphone-lines"></i> Microphone</h4>
+                                <span id="micPermStatus" style="font-size: 0.85rem; color: #777;">Checking...</span>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.85rem;" onclick="requestMicrophone()">Verify</button>
+                        </div>
+                        <hr style="border:0; border-top:1px solid rgba(0,0,0,0.1); margin:15px 0;">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4><i class="fa-solid fa-bell"></i> Notifications</h4>
+                                <span id="notifPermStatus" style="font-size: 0.85rem; color: #777;">Checking...</span>
+                            </div>
+                            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 0.85rem;" onclick="requestNotifications()">Verify</button>
+                        </div>
+                        <p style="font-size: 0.75rem; color: #999; margin-top: 15px;">Note: Browser/Device OS controls ultimate enforcement of permissions.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container">
+                <p>&copy; 2026 DefendHer - Professional Women Safety Application.</p>
+            </div>
+        </footer>
+
+    </div> <!-- End Main Content -->
+
+    <!-- Fake Call Overlay -->
+    <div id="fakeCallScreen" class="fake-call-screen" style="display:none;">
+        <div class="fake-call-info animate__animated animate__zoomIn">
+            <h2 id="callerName">Dad</h2>
+            <p id="callerNumber">Mobile</p>
+            <div class="call-time" id="callTime">00:00</div>
+        </div>
+        <div class="fake-call-actions">
+            <button class="btn-call-decline animate__animated animate__bounceIn" onclick="endFakeCall()">
+                <i class="fa-solid fa-phone-slash"></i>
+            </button>
+            <button class="btn-call-accept pulse-green" id="fakeCallAcceptBtn" onclick="acceptFakeCall()">
+                <i class="fa-solid fa-phone"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Global SOS Button -->
+    <button id="floatingSOS" onclick="triggerSOS()" title="Emergency SOS">
+        <i class="fa-solid fa-power-off"></i>
+    </button>
+
+    <!-- Hidden Audios -->
+    <audio id="sirenAudio" src="https://assets.mixkit.co/active_storage/sfx/993/993-preview.mp3" loop></audio>
+    <audio id="ringtoneAudio" src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" loop></audio>
+
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+    <!-- Firebase SDK Setup provided via CDN for future strict Auth handling -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+
+    <!-- Main Logic -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
